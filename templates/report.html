@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Report Form</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='notifications.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-left">
+            <a href="/dashboard" class="brand-link">
+                <i class="fas fa-hard-drive"></i>
+                <span class="brand-name">Hard Disk</span>
+            </a>
+        </div>
+        <div class="nav-right">
+            <a href="/report" class="nav-link">
+                <i class="fas fa-file-alt"></i> Report
+            </a>
+            <div class="user-menu">
+                <i class="fas fa-user-circle"></i>
+                <span class="username">{{ username }}</span>
+                <a href="/logout" class="logout-btn">
+                    <i class="fas fa-sign-out-alt"></i> Sign Out
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="report-container">
+        <h2><i class="fas fa-clipboard-list"></i> Submit Report</h2>
+        <form action="/submit-report" method="POST" class="report-form" id="multi-step-form">
+            <!-- Step 1 -->
+            <div class="form-step active" id="step-1">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="branch">Branches</label>
+                        <div class="custom-dropdown">
+                            <input type="text" name="branch" id="branch" autocomplete="off" placeholder="Search or select branch..." required>
+                            <i class="fas fa-chevron-down dropdown-icon"></i>
+                            <div class="dropdown-list" id="branch-dropdown">
+                                <div class="dropdown-item" data-value="ACCRA CENTRAL">ACCRA CENTRAL</div>
+                                <div class="dropdown-item" data-value="ABBOSEY OKAI">ABBOSEY OKAI</div>
+                                <div class="dropdown-item" data-value="ABEAKA LAPAZ">ABEAKA LAPAZ</div>
+                                <div class="dropdown-item" data-value="ABOABO">ABOABO</div>
+                                <div class="dropdown-item" data-value="ADENTA">ADENTA</div>
+                                <div class="dropdown-item" data-value="ADUM">ADUM</div>
+                                <div class="dropdown-item" data-value="AIRPORT CITY">AIRPORT CITY</div>
+                                <div class="dropdown-item" data-value="AFFUL NKWANTA">AFFUL NKWANTA</div>
+                                <div class="dropdown-item" data-value="ATONSU">ATONSU</div>
+                                <div class="dropdown-item" data-value="CANTONMENT">CANTONMENT</div>
+                                <div class="dropdown-item" data-value="CAPE COAST">CAPE COAST</div>
+                                <div class="dropdown-item" data-value="EAST LEGON">EAST LEGON</div>
+                                <div class="dropdown-item" data-value="GICEL ESTATE">GICEL ESTATE</div>
+                                <div class="dropdown-item" data-value="HAATSO">HAATSO</div>
+                                <div class="dropdown-item" data-value="KUMASI">KUMASI</div>
+                                <div class="dropdown-item" data-value="MADINA">MADINA</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="start_date">Starting Date</label>
+                        <input type="date" name="start_date" id="start_date" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="end_date">Ending Date</label>
+                        <input type="date" name="end_date" id="end_date" required>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="drive1">Drive 1</label>
+                        <input type="text" name="drive1" id="drive1" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="drive2">Drive 2 <span style="color: #999; font-size: 12px;">(Optional)</span></label>
+                        <input type="text" name="drive2" id="drive2">
+                    </div>
+                </div>
+
+                <button type="button" class="next-btn" onclick="nextStep()">
+                    Next <i class="fas fa-arrow-right"></i>
+                </button>
+            </div>
+
+            <!-- Step 2 -->
+            <div class="form-step" id="step-2">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="previous_branch">Previous Hard Drive Branch</label>
+                        <input type="text" name="previous_branch" id="previous_branch" required>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="previous_data_from">Previous HDD From</label>
+                        <input type="text" name="previous_data_from" id="previous_data_from" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="previous_data_to">Previous HDD To</label>
+                        <input type="text" name="previous_data_to" id="previous_data_to" required>
+                    </div>
+                </div>
+
+                <div class="form-buttons">
+                    <button type="button" class="back-btn" onclick="prevStep()">
+                        <i class="fas fa-arrow-left"></i> Back
+                    </button>
+                    <button type="submit" class="submit-btn">
+                        <i class="fas fa-paper-plane"></i> Submit Report
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="flash-message" data-type="{{ category }}" data-message="{{ message }}" style="display:none;"></div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <script src="{{ url_for('static', filename='notifications.js') }}"></script>
+    <script src="{{ url_for('static', filename='main.js') }}"></script>
+</body>
+</html>

@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='notifications.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-left">
+            <a href="/dashboard" class="brand-link">
+                <i class="fas fa-hard-drive"></i>
+                <span class="brand-name">Hard Disk</span>
+            </a>
+        </div>
+        <div class="nav-right">
+            <a href="/report" class="nav-link">
+                <i class="fas fa-file-alt"></i> Report
+            </a>
+            <div class="user-menu">
+                <i class="fas fa-user-circle"></i>
+                <span class="username">{{ username }}</span>
+                <a href="/logout" class="logout-btn">
+                    <i class="fas fa-sign-out-alt"></i> Sign Out
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="dashboard-content">
+        <div class="stats-container">
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-hdd"></i>
+                </div>
+                <div class="stat-info">
+                    <h3>TOTAL DRIVES</h3>
+                    <p class="stat-number">24</p>
+                    <span class="stat-label">Active Hard Drives</span>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-file-alt"></i>
+                </div>
+                <div class="stat-info">
+                    <h3>REPORTS</h3>
+                    <p class="stat-number">{{ reports|length }}</p>
+                    <span class="stat-label">Total Submitted</span>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-code-branch"></i>
+                </div>
+                <div class="stat-info">
+                    <h3>BRANCHES</h3>
+                    <p class="stat-number">16</p>
+                    <span class="stat-label">Total Locations</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="reports-section">
+            <div class="section-header">
+                <h2><i class="fas fa-list"></i> Report Management</h2>
+                <div class="header-actions">
+                    <div class="filter-dropdown">
+                        <button class="filter-btn" onclick="toggleFilter()">
+                            <i class="fas fa-filter"></i> Filter
+                            <span class="filter-count" id="filter-count" style="display: none;">0</span>
+                        </button>
+                        <div class="filter-overlay" id="filter-overlay" onclick="toggleFilter()"></div>
+                        <div class="filter-menu" id="filter-menu">
+                            <div class="filter-group">
+                                <label><i class="fas fa-map-marker-alt"></i> Branch</label>
+                                <select id="filter-branch">
+                                    <option value="">All Branches</option>
+                                    <option value="ACCRA CENTRAL">ACCRA CENTRAL</option>
+                                    <option value="ABBOSEY OKAI">ABBOSEY OKAI</option>
+                                    <option value="ABEAKA LAPAZ">ABEAKA LAPAZ</option>
+                                    <option value="ABOABO">ABOABO</option>
+                                    <option value="ADENTA">ADENTA</option>
+                                    <option value="ADUM">ADUM</option>
+                                    <option value="AIRPORT CITY">AIRPORT CITY</option>
+                                    <option value="AFFUL NKWANTA">AFFUL NKWANTA</option>
+                                    <option value="ATONSU">ATONSU</option>
+                                    <option value="CANTONMENT">CANTONMENT</option>
+                                    <option value="CAPE COAST">CAPE COAST</option>
+                                    <option value="EAST LEGON">EAST LEGON</option>
+                                    <option value="GICEL ESTATE">GICEL ESTATE</option>
+                                    <option value="HAATSO">HAATSO</option>
+                                    <option value="KUMASI">KUMASI</option>
+                                    <option value="MADINA">MADINA</option>
+                                </select>
+                            </div>
+                            <div class="filter-group">
+                                <label><i class="fas fa-hdd"></i> Drive 1</label>
+                                <input type="text" id="filter-drive1" placeholder="Search by Drive 1...">
+                            </div>
+                            <div class="filter-group">
+                                <label><i class="fas fa-hdd"></i> Drive 2</label>
+                                <input type="text" id="filter-drive2" placeholder="Search by Drive 2...">
+                            </div>
+                            <div class="filter-group">
+                                <label><i class="fas fa-calendar-alt"></i> Date Range</label>
+                                <div class="date-range-container">
+                                    <input type="date" id="filter-start">
+                                    <span class="date-separator">to</span>
+                                    <input type="date" id="filter-end">
+                                </div>
+                            </div>
+                            <div class="filter-actions">
+                                <button class="apply-filter-btn" onclick="applyFilters()">
+                                    <i class="fas fa-search"></i> Search
+                                </button>
+                                <button class="clear-filter-btn" onclick="clearFilters()">
+                                    <i class="fas fa-times-circle"></i> Clear
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <a href="/export/excel" class="export-btn excel-btn"><i class="fas fa-file-excel"></i> Excel</a>
+                    <a href="/export/pdf" class="export-btn pdf-btn"><i class="fas fa-file-pdf"></i> PDF</a>
+                </div>
+            </div>
+
+            <div class="table-container">
+                <table class="reports-table">
+                    <thead>
+                        <tr>
+                            <th>USER</th>
+                            <th>BRANCH</th>
+                            <th>START DATE</th>
+                            <th>END DATE</th>
+                            <th>DRIVE 1</th>
+                            <th>DRIVE 2</th>
+                            <th>PREVIOUS BRANCH</th>
+                            <th>ACTIONS</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if reports %}
+                            {% for report in reports %}
+                            <tr>
+                                <td>
+                                    <div class="user-cell">
+                                        <div class="user-avatar">{{ report.username[0].upper() }}</div>
+                                        <div class="user-info">
+                                            <span class="user-name">{{ report.username }}</span>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td><span class="badge badge-branch">{{ report.branch }}</span></td>
+                                <td>{{ report.start_date }}</td>
+                                <td>{{ report.end_date }}</td>
+                                <td>{{ report.drive1 }}</td>
+                                <td>{{ report.drive2 }}</td>
+                                <td>{{ report.previous_branch }}</td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <button class="action-btn view-btn" title="View"><i class="fas fa-eye"></i></button>
+                                        <button class="action-btn edit-btn" title="Edit"><i class="fas fa-edit"></i></button>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr>
+                                <td colspan="8" class="no-data">No reports submitted yet</td>
+                            </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="flash-message" data-type="{{ category }}" data-message="{{ message }}" style="display:none;"></div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <script src="{{ url_for('static', filename='notifications.js') }}"></script>
+    <script src="{{ url_for('static', filename='main.js') }}"></script>
+</body>
+</html>
