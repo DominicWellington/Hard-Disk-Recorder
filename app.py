@@ -8,13 +8,21 @@ from reportlab.lib import colors
 from reportlab.lib.pagesizes import letter, landscape
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
 from reportlab.lib.styles import getSampleStyleSheet
+from dotenv import load_dotenv
+import certifi
+
+# Load environment variables from .env file
+load_dotenv()
 
 app = Flask(__name__)
 app.secret_key = os.environ.get('SECRET_KEY', 'your-secret-key-here')
 
-# Connect to MongoDB
-mongo_uri = os.environ.get('MONGODB_URI', 'mongodb://localhost:27017/')
-client = MongoClient(mongo_uri)
+# Connect to MongoDB Atlas with SSL certificate
+mongo_uri = os.environ.get('MONGODB_URI')
+if not mongo_uri:
+    raise ValueError("MONGODB_URI environment variable is not set. Please check your .env file.")
+
+client = MongoClient(mongo_uri, tlsCAFile=certifi.where())
 db = client["Harddisk"]
 users_collection = db["Logindata"]
 
