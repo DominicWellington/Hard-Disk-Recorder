@@ -126,7 +126,7 @@ document.addEventListener('click', function(e) {
 
 // Pagination variables
 let currentPage = 1;
-let recordsPerPage = 6;
+let recordsPerPage = 5;
 let allRows = [];
 let filteredRows = [];
 
@@ -172,8 +172,8 @@ function updatePagination() {
   if (endRecordElement) endRecordElement.textContent = endRecord;
   if (totalRecordsElement) totalRecordsElement.textContent = totalRecords;
   
-  // Generate page numbers
-  generatePageNumbers(totalPages);
+  // Update current page display
+  updateCurrentPageDisplay(totalPages);
   
   // Show/hide rows
   showCurrentPageRows();
@@ -185,66 +185,35 @@ function updatePagination() {
   }
 }
 
-function generatePageNumbers(totalPages) {
-  const paginationNumbers = document.getElementById('pagination-numbers');
-  if (!paginationNumbers) return;
+function updateCurrentPageDisplay(totalPages) {
+  const currentPageElement = document.getElementById('current-page');
+  const prevBtn = document.getElementById('prev-btn');
+  const nextBtn = document.getElementById('next-btn');
   
-  paginationNumbers.innerHTML = '';
-  
-  if (totalPages <= 1) {
-    // Still show page 1 if we have data
-    if (totalPages === 1) {
-      addPageNumber(1);
-    }
-    return;
+  if (currentPageElement) {
+    currentPageElement.textContent = currentPage;
   }
   
-  const maxVisiblePages = 7;
-  let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
-  let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
-  
-  // Adjust start page if we're near the end
-  if (endPage - startPage < maxVisiblePages - 1) {
-    startPage = Math.max(1, endPage - maxVisiblePages + 1);
+  if (prevBtn) {
+    prevBtn.disabled = currentPage === 1;
   }
   
-  // Add first page and ellipsis if needed
-  if (startPage > 1) {
-    addPageNumber(1);
-    if (startPage > 2) {
-      addEllipsis();
-    }
-  }
-  
-  // Add visible page numbers
-  for (let i = startPage; i <= endPage; i++) {
-    addPageNumber(i);
-  }
-  
-  // Add ellipsis and last page if needed
-  if (endPage < totalPages) {
-    if (endPage < totalPages - 1) {
-      addEllipsis();
-    }
-    addPageNumber(totalPages);
+  if (nextBtn) {
+    nextBtn.disabled = currentPage === totalPages || totalPages === 0;
   }
 }
 
-function addPageNumber(pageNum) {
-  const paginationNumbers = document.getElementById('pagination-numbers');
-  const pageButton = document.createElement('button');
-  pageButton.className = `page-number ${pageNum === currentPage ? 'active' : ''}`;
-  pageButton.textContent = pageNum;
-  pageButton.onclick = () => goToPage(pageNum);
-  paginationNumbers.appendChild(pageButton);
+function previousPage() {
+  if (currentPage > 1) {
+    goToPage(currentPage - 1);
+  }
 }
 
-function addEllipsis() {
-  const paginationNumbers = document.getElementById('pagination-numbers');
-  const ellipsis = document.createElement('span');
-  ellipsis.className = 'page-ellipsis';
-  ellipsis.textContent = '...';
-  paginationNumbers.appendChild(ellipsis);
+function nextPage() {
+  const totalPages = Math.ceil(filteredRows.length / recordsPerPage);
+  if (currentPage < totalPages) {
+    goToPage(currentPage + 1);
+  }
 }
 
 function showCurrentPageRows() {
