@@ -124,13 +124,81 @@ def submit_report():
     flash('Report submitted successfully!', 'success')
     return redirect(url_for('dashboard'))
 
+@app.route('/edit-report/<report_id>')
+def edit_report(report_id):
+    if 'username' not in session:
+        return redirect(url_for('index'))
+    
+    from bson import ObjectId
+    try:
+        # Get the specific report
+        reports_collection = db["Reports"]
+        report = reports_collection.find_one({'_id': ObjectId(report_id)})
+        
+        if not report:
+            flash('Report not found', 'error')
+            return redirect(url_for('dashboard'))
+        
+        # Check if user owns this report or is admin (for now, let anyone edit)
+        # if report['username'] != session['username']:
+        #     flash('You can only edit your own reports', 'error')
+        #     return redirect(url_for('dashboard'))
+        
+        return render_template('edit_report.html', username=session['username'], report=report)
+    
+    except Exception as e:
+        flash('Invalid report ID', 'error')
+        return redirect(url_for('dashboard'))
+
+@app.route('/update-report/<report_id>', methods=['POST'])
+def update_report(report_id):
+    if 'username' not in session:
+        return redirect(url_for('index'))
+    
+    from bson import ObjectId
+    try:
+        branch = request.form.get('branch')
+        start_date = request.form.get('start_date')
+        end_date = request.form.get('end_date')
+        drive1 = request.form.get('drive1')
+        drive2 = request.form.get('drive2')
+        previous_branch = request.form.get('previous_branch')
+        previous_data_from = request.form.get('previous_data_from')
+        previous_data_to = request.form.get('previous_data_to')
+        
+        # Update report in database
+        reports_collection = db["Reports"]
+        result = reports_collection.update_one(
+            {'_id': ObjectId(report_id)},
+            {'$set': {
+                'branch': branch,
+                'start_date': start_date,
+                'end_date': end_date,
+                'drive1': drive1,
+                'drive2': drive2,
+                'previous_branch': previous_branch,
+                'previous_data_from': previous_data_from,
+                'previous_data_to': previous_data_to,
+                'updated_at': datetime.now().isoformat()
+            }}
+        )
+        
+        if result.modified_count > 0:
+            flash('Report updated successfully!', 'success')
+        else:
+            flash('No changes were made to the report', 'info')
+        
+        return redirect(url_for('dashboard'))
+    
+    except Exception as e:
+        flash('Error updating report', 'error')
+        return redirect(url_for('dashboard'))
+
 @app.route('/logout')
 def logout():
     session.pop('username', None)
     flash('You have been logged out', 'success')
     return redirect(url_for('index'))
-
-@app.route('/export/excel')
 def export_excel():
     if 'username' not in session:
         return redirect(url_for('index'))

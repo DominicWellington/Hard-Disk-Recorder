@@ -59,13 +59,14 @@ document.addEventListener('DOMContentLoaded', function() {
 function nextStep() {
   const step1 = document.getElementById('step-1');
   const step2 = document.getElementById('step-2');
+  const stepIndicator1 = document.getElementById('step-indicator-1');
+  const stepIndicator2 = document.getElementById('step-indicator-2');
   
   // Validate step 1 fields
   const branch = document.getElementById('branch').value;
   const startDate = document.getElementById('start_date').value;
   const endDate = document.getElementById('end_date').value;
   const drive1 = document.getElementById('drive1').value;
-  const drive2 = document.getElementById('drive2').value;
   
   if (!branch || !startDate || !endDate || !drive1) {
     alert('Please fill in all required fields before proceeding');
@@ -74,15 +75,29 @@ function nextStep() {
   
   step1.classList.remove('active');
   step2.classList.add('active');
+  
+  // Update step indicators
+  stepIndicator1.classList.remove('active');
+  stepIndicator1.classList.add('completed');
+  stepIndicator2.classList.add('active');
+  
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 function prevStep() {
   const step1 = document.getElementById('step-1');
   const step2 = document.getElementById('step-2');
+  const stepIndicator1 = document.getElementById('step-indicator-1');
+  const stepIndicator2 = document.getElementById('step-indicator-2');
   
   step2.classList.remove('active');
   step1.classList.add('active');
+  
+  // Update step indicators
+  stepIndicator1.classList.remove('completed');
+  stepIndicator1.classList.add('active');
+  stepIndicator2.classList.remove('active');
+  
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
@@ -109,14 +124,168 @@ document.addEventListener('click', function(e) {
   }
 });
 
+// Pagination variables
+let currentPage = 1;
+let recordsPerPage = 6;
+let allRows = [];
+let filteredRows = [];
+
+// Initialize pagination when page loads
+document.addEventListener('DOMContentLoaded', function() {
+  initializePagination();
+});
+
+function initializePagination() {
+  const tbody = document.getElementById('reports-tbody');
+  if (!tbody) return;
+  
+  allRows = Array.from(tbody.querySelectorAll('tr'));
+  // Filter out "no data" rows
+  allRows = allRows.filter(row => !row.querySelector('.no-data'));
+  filteredRows = [...allRows];
+  
+  // Update total records count
+  const totalRecordsElement = document.getElementById('total-records');
+  if (totalRecordsElement) {
+    totalRecordsElement.textContent = allRows.length;
+  }
+  
+  // Only show pagination if we have data
+  if (allRows.length > 0) {
+    updatePagination();
+  }
+}
+
+function updatePagination() {
+  const totalRecords = filteredRows.length;
+  const totalPages = Math.ceil(totalRecords / recordsPerPage);
+  
+  // Update pagination info
+  const startRecord = totalRecords === 0 ? 0 : (currentPage - 1) * recordsPerPage + 1;
+  const endRecord = Math.min(currentPage * recordsPerPage, totalRecords);
+  
+  const startRecordElement = document.getElementById('start-record');
+  const endRecordElement = document.getElementById('end-record');
+  const totalRecordsElement = document.getElementById('total-records');
+  
+  if (startRecordElement) startRecordElement.textContent = startRecord;
+  if (endRecordElement) endRecordElement.textContent = endRecord;
+  if (totalRecordsElement) totalRecordsElement.textContent = totalRecords;
+  
+  // Generate page numbers
+  generatePageNumbers(totalPages);
+  
+  // Show/hide rows
+  showCurrentPageRows();
+  
+  // Show/hide pagination container based on whether we need pagination
+  const paginationContainer = document.querySelector('.pagination-container');
+  if (paginationContainer) {
+    paginationContainer.style.display = totalPages > 1 ? 'flex' : 'flex';
+  }
+}
+
+function generatePageNumbers(totalPages) {
+  const paginationNumbers = document.getElementById('pagination-numbers');
+  if (!paginationNumbers) return;
+  
+  paginationNumbers.innerHTML = '';
+  
+  if (totalPages <= 1) {
+    // Still show page 1 if we have data
+    if (totalPages === 1) {
+      addPageNumber(1);
+    }
+    return;
+  }
+  
+  const maxVisiblePages = 7;
+  let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+  let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+  
+  // Adjust start page if we're near the end
+  if (endPage - startPage < maxVisiblePages - 1) {
+    startPage = Math.max(1, endPage - maxVisiblePages + 1);
+  }
+  
+  // Add first page and ellipsis if needed
+  if (startPage > 1) {
+    addPageNumber(1);
+    if (startPage > 2) {
+      addEllipsis();
+    }
+  }
+  
+  // Add visible page numbers
+  for (let i = startPage; i <= endPage; i++) {
+    addPageNumber(i);
+  }
+  
+  // Add ellipsis and last page if needed
+  if (endPage < totalPages) {
+    if (endPage < totalPages - 1) {
+      addEllipsis();
+    }
+    addPageNumber(totalPages);
+  }
+}
+
+function addPageNumber(pageNum) {
+  const paginationNumbers = document.getElementById('pagination-numbers');
+  const pageButton = document.createElement('button');
+  pageButton.className = `page-number ${pageNum === currentPage ? 'active' : ''}`;
+  pageButton.textContent = pageNum;
+  pageButton.onclick = () => goToPage(pageNum);
+  paginationNumbers.appendChild(pageButton);
+}
+
+function addEllipsis() {
+  const paginationNumbers = document.getElementById('pagination-numbers');
+  const ellipsis = document.createElement('span');
+  ellipsis.className = 'page-ellipsis';
+  ellipsis.textContent = '...';
+  paginationNumbers.appendChild(ellipsis);
+}
+
+function showCurrentPageRows() {
+  const tbody = document.getElementById('reports-tbody');
+  if (!tbody) return;
+  
+  const startIndex = (currentPage - 1) * recordsPerPage;
+  const endIndex = startIndex + recordsPerPage;
+  
+  // Hide all rows first
+  allRows.forEach(row => {
+    row.style.display = 'none';
+  });
+  
+  // Show only current page rows from filtered results
+  const rowsToShow = filteredRows.slice(startIndex, endIndex);
+  rowsToShow.forEach(row => {
+    row.style.display = '';
+  });
+  
+  // If no rows to show and we have a "no data" row, show it
+  if (rowsToShow.length === 0 && filteredRows.length === 0) {
+    const noDataRow = tbody.querySelector('.no-data');
+    if (noDataRow && noDataRow.parentElement) {
+      noDataRow.parentElement.style.display = '';
+    }
+  }
+}
+
+function goToPage(pageNum) {
+  currentPage = pageNum;
+  updatePagination();
+}
+
+// Update the existing applyFilters function to work with pagination
 function applyFilters() {
   const branchFilter = document.getElementById('filter-branch').value.toLowerCase();
   const drive1Filter = document.getElementById('filter-drive1').value.toLowerCase();
   const drive2Filter = document.getElementById('filter-drive2').value.toLowerCase();
   const startDateFilter = document.getElementById('filter-start').value;
   const endDateFilter = document.getElementById('filter-end').value;
-  
-  const rows = document.querySelectorAll('.reports-table tbody tr');
   
   // Count active filters
   let activeFilters = 0;
@@ -135,11 +304,10 @@ function applyFilters() {
     filterCount.style.display = 'none';
   }
   
-  let visibleCount = 0;
-  
-  rows.forEach(row => {
+  // Filter rows
+  filteredRows = allRows.filter(row => {
     // Skip "no data" row
-    if (row.querySelector('.no-data')) return;
+    if (row.querySelector('.no-data')) return false;
     
     const cells = row.querySelectorAll('td');
     const branch = cells[1].textContent.toLowerCase().trim();
@@ -147,42 +315,23 @@ function applyFilters() {
     const drive1 = cells[4].textContent.toLowerCase().trim();
     const drive2 = cells[5].textContent.toLowerCase().trim();
     
-    let showRow = true;
+    // Apply filters
+    if (branchFilter && !branch.includes(branchFilter)) return false;
+    if (drive1Filter && !drive1.includes(drive1Filter)) return false;
+    if (drive2Filter && !drive2.includes(drive2Filter)) return false;
+    if (startDateFilter && startDate < startDateFilter) return false;
+    if (endDateFilter && startDate > endDateFilter) return false;
     
-    // Filter by branch
-    if (branchFilter && !branch.includes(branchFilter)) {
-      showRow = false;
-    }
-    
-    // Filter by drive1
-    if (drive1Filter && !drive1.includes(drive1Filter)) {
-      showRow = false;
-    }
-    
-    // Filter by drive2
-    if (drive2Filter && !drive2.includes(drive2Filter)) {
-      showRow = false;
-    }
-    
-    // Filter by date range
-    if (startDateFilter && startDate < startDateFilter) {
-      showRow = false;
-    }
-    
-    if (endDateFilter && startDate > endDateFilter) {
-      showRow = false;
-    }
-    
-    row.style.display = showRow ? '' : 'none';
-    if (showRow) visibleCount++;
+    return true;
   });
   
-  // Close filter menu and overlay after applying filters
+  // Reset to first page and update pagination
+  currentPage = 1;
+  updatePagination();
+  
+  // Close filter menu and overlay
   document.getElementById('filter-menu').classList.remove('active');
   document.getElementById('filter-overlay').classList.remove('active');
-  
-  // Show notification with results
-  console.log(`Found ${visibleCount} matching records out of ${rows.length - 1} total`);
 }
 
 function clearFilters() {
@@ -196,13 +345,19 @@ function clearFilters() {
   const filterCount = document.getElementById('filter-count');
   filterCount.style.display = 'none';
   
-  // Show all rows
-  const rows = document.querySelectorAll('.reports-table tbody tr');
-  rows.forEach(row => {
-    row.style.display = '';
-  });
+  // Reset filtered rows to all rows
+  filteredRows = [...allRows];
+  
+  // Reset to first page and update pagination
+  currentPage = 1;
+  updatePagination();
   
   // Close filter menu and overlay
   document.getElementById('filter-menu').classList.remove('active');
   document.getElementById('filter-overlay').classList.remove('active');
+}
+
+// Edit report function
+function editReport(reportId) {
+  window.location.href = `/edit-report/${reportId}`;
 }
