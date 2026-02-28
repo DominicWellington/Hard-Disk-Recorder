@@ -1,34 +1,59 @@
+
+
+
+/* Login and Signup Page Styles */
 body {
-  font-family: Arial, sans-serif;
-  background: linear-gradient(135deg, #ffd1e2, #97dde8);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Login page specific body styling */
+body:has(.form-container) {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100vh;
-  margin: 0;
+  min-height: 100vh;
+  padding: 20px;
 }
 
 .form-container {
-  background: #fff;
-  padding: 30px;
-  border-radius: 10px;
-  box-shadow: 0 6px 15px rgba(0,0,0,0.2);
-  width: 320px;
+  background: white;
+  padding: 40px;
+  border-radius: 20px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  width: 100%;
+  max-width: 420px;
   position: relative;
   overflow: hidden;
 }
 
-.form-box {
-  transition: all 0.6s ease;
-}
-
-.hidden {
-  opacity: 0;
-  transform: translateX(100%);
+.form-container::before {
+  content: '';
   position: absolute;
   top: 0;
   left: 0;
-  width: 100%;
+  right: 0;
+  height: 5px;
+  background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+}
+
+.form-box {
+  transition: all 0.4s ease;
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.form-box.hidden {
+  opacity: 0;
+  transform: translateX(100%);
+  position: absolute;
+  top: 40px;
+  left: 40px;
+  right: 40px;
+  pointer-events: none;
 }
 
 .form-box:not(.hidden) {
@@ -37,73 +62,100 @@ body {
   position: relative;
 }
 
-h2 {
+.form-container h2 {
   text-align: center;
-  margin-bottom: 20px;
+  margin-bottom: 30px;
+  margin-top: 0;
   color: #333;
-  font-family:Verdana, Geneva, Tahoma, sans-serif;
+  font-size: 28px;
+  font-weight: 600;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 10px;
 }
 
-h2 i {
-  color: #0078d7;
+.form-container h2 i {
+  color: #667eea;
+  font-size: 24px;
 }
 
-.form-group {
-  margin-bottom: 15px;
+.form-container .form-group {
+  margin-bottom: 20px;
 }
 
-.form-group label {
+.form-container .form-group label {
   display: block;
   font-size: 14px;
-  margin-bottom: 5px;
+  margin-bottom: 8px;
   color: #555;
+  font-weight: 500;
 }
 
-.form-group input {
+.form-container .form-group input {
   width: 100%;
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
+  padding: 12px 16px;
+  border: 2px solid #e0e0e0;
+  border-radius: 10px;
+  font-size: 15px;
+  transition: all 0.3s ease;
+  box-sizing: border-box;
+  background: #f8f9fa;
 }
 
-button {
+.form-container .form-group input:focus {
+  outline: none;
+  border-color: #667eea;
+  background: white;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.form-container .form-group input:hover {
+  border-color: #667eea;
+  background: white;
+}
+
+.form-container button {
   width: 100%;
-  padding: 10px;
-  background: #0078d7;
+  padding: 14px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   border: none;
-  border-radius: 5px;
-  color: #fff;
-  font-family: 'Times New Roman', Times, serif;
-  font-size: 18px;
-  font-weight: 400;
+  border-radius: 10px;
+  color: white;
+  font-size: 16px;
+  font-weight: 600;
   cursor: pointer;
-  transition: background 0.3s ease;
+  transition: all 0.3s ease;
+  margin-top: 10px;
 }
 
-button:hover {
-  background: #005a9e;
+.form-container button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+}
+
+.form-container button:active {
+  transform: translateY(0);
 }
 
 .toggle-text {
   text-align: center;
-  margin-top: 15px;
+  margin-top: 25px;
   font-size: 14px;
+  color: #666;
 }
 
 .toggle-text a {
-  color: #0078d7;
+  color: #667eea;
   text-decoration: none;
-  font-weight: bold;
+  font-weight: 600;
+  transition: color 0.3s ease;
 }
 
 .toggle-text a:hover {
+  color: #764ba2;
   text-decoration: underline;
 }
-
 
 
 /* Navbar Styles */
