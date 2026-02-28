@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,6 +9,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='notifications.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
+
 <body>
     <nav class="navbar">
         <div class="nav-left">
@@ -60,7 +62,7 @@
                 </div>
                 <div class="stat-info">
                     <h3>BRANCHES</h3>
-                    <p class="stat-number">16</p>
+                    <p class="stat-number">{{ branch_count }}</p>
                     <span class="stat-label">Total Locations</span>
                 </div>
             </div>
@@ -97,115 +99,141 @@
                                     <option value="HAATSO">HAATSO</option>
                                     <option value="KUMASI">KUMASI</option>
                                     <option value="MADINA">MADINA</option>
-                                </select>
+                                    <option value="MAKOLA">MAKOLA</option>
+                                    <option value="METHODIST UNIVERSITY">METHODIST UNIVERSITY
                             </div>
-                            <div class="filter-group">
-                                <label><i class="fas fa-hdd"></i> Drive 1</label>
-                                <input type="text" id="filter-drive1" placeholder="Search by Drive 1...">
-                            </div>
-                            <div class="filter-group">
-                                <label><i class="fas fa-hdd"></i> Drive 2</label>
-                                <input type="text" id="filter-drive2" placeholder="Search by Drive 2...">
-                            </div>
-                            <div class="filter-group">
-                                <label><i class="fas fa-calendar-alt"></i> Date Range</label>
-                                <div class="date-range-container">
-                                    <input type="date" id="filter-start">
-                                    <span class="date-separator">to</span>
-                                    <input type="date" id="filter-end">
-                                </div>
-                            </div>
-                            <div class="filter-actions">
-                                <button class="apply-filter-btn" onclick="applyFilters()">
-                                    <i class="fas fa-search"></i> Search
-                                </button>
-                                <button class="clear-filter-btn" onclick="clearFilters()">
-                                    <i class="fas fa-times-circle"></i> Clear
-                                </button>
+                            <option value="NUNGUA">NUNGUA</option>
+                            <option value="ODORKOR">ODORKOR</option>
+                            <option value="OKAISHI">OKAISHI</option>
+                            <option value="RING ROAD CENTRAL">RING ROAD CENTRAL</option>
+                            <option value="SANTASI">SANTASI</option>
+                            <option value="SPINTEX">SPINTEX</option>
+                            <option value="SUAME MAAKRO">SUAME MAAKRO</option>
+                            <option value="SUNYANI">SUNYANI</option>
+                            <option value="TAIFA">TAIFA</option>
+                            <option value="TAKORADI HARBOUR">TAKORADI HARBOUR</option>
+                            <option value="TAMALE">TAMALE</option>
+                            <option value="TAKORADI MARKET">TAKORADI MARKET</option>
+                            <option value="TECHIMAN">TECHIMAN</option>
+                            <option value="TEMA COMMUNITY 1">TEMA COMMUNITY 1</option>
+                            <option value="TEMA FISHING HARBOUR">TEMA FISHING HARBOUR</option>
+                            <option value="TESANO">TESANO</option>
+                            <option value="UCC ANNEX">UCC ANNEX</option>
+                            <option value="UNIVERSITY OF GHANA">UNIVERSITY OF GHANA</option>
+                            <option value="VALLEY VIEW">VALLEY VIEW</option>
+                            <option value="WEIJA">WEIJA</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label><i class="fas fa-hdd"></i> Drive 1</label>
+                            <input type="text" id="filter-drive1" placeholder="Search by Drive 1...">
+                        </div>
+                        <div class="filter-group">
+                            <label><i class="fas fa-hdd"></i> Drive 2</label>
+                            <input type="text" id="filter-drive2" placeholder="Search by Drive 2...">
+                        </div>
+                        <div class="filter-group">
+                            <label><i class="fas fa-calendar-alt"></i> Date Range</label>
+                            <div class="date-range-container">
+                                <input type="date" id="filter-start">
+                                <span class="date-separator">to</span>
+                                <input type="date" id="filter-end">
                             </div>
                         </div>
+                        <div class="filter-actions">
+                            <button class="apply-filter-btn" onclick="applyFilters()">
+                                <i class="fas fa-search"></i> Search
+                            </button>
+                            <button class="clear-filter-btn" onclick="clearFilters()">
+                                <i class="fas fa-times-circle"></i> Clear
+                            </button>
+                        </div>
                     </div>
-                    <a href="/export/excel" class="export-btn excel-btn"><i class="fas fa-file-excel"></i> Excel</a>
-                    <a href="/export/pdf" class="export-btn pdf-btn"><i class="fas fa-file-pdf"></i> PDF</a>
                 </div>
+                <a href="/export/excel" class="export-btn excel-btn"><i class="fas fa-file-excel"></i> Excel</a>
+                <a href="/export/pdf" class="export-btn pdf-btn"><i class="fas fa-file-pdf"></i> PDF</a>
             </div>
+        </div>
 
-            <div class="table-container">
-                <table class="reports-table">
-                    <thead>
-                        <tr>
-                            <th>USER</th>
-                            <th>BRANCH</th>
-                            <th>START DATE</th>
-                            <th>END DATE</th>
-                            <th>DRIVE 1</th>
-                            <th>DRIVE 2</th>
-                            <th>PREVIOUS BRANCH</th>
-                            <th>ACTIONS</th>
-                        </tr>
-                    </thead>
-                    <tbody id="reports-tbody">
-                        {% if reports %}
-                            {% for report in reports %}
-                            <tr>
-                                <td>
-                                    <div class="user-cell">
-                                        <div class="user-avatar">{{ report.username[0].upper() }}</div>
-                                        <div class="user-info">
-                                            <span class="user-name">{{ report.username }}</span>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td><span class="badge badge-branch">{{ report.branch }}</span></td>
-                                <td>{{ report.start_date }}</td>
-                                <td>{{ report.end_date }}</td>
-                                <td>{{ report.drive1 }}</td>
-                                <td>{{ report.drive2 }}</td>
-                                <td>{{ report.previous_branch }}</td>
-                                <td>
-                                    <div class="action-buttons">
-                                        <button class="action-btn view-btn" title="View"><i class="fas fa-eye"></i></button>
-                                        <button class="action-btn edit-btn" title="Edit" onclick="editReport('{{ report._id }}')"><i class="fas fa-edit"></i></button>
-                                    </div>
-                                </td>
-                            </tr>
-                            {% endfor %}
-                        {% else %}
-                            <tr>
-                                <td colspan="8" class="no-data">No reports submitted yet</td>
-                            </tr>
-                        {% endif %}
-                    </tbody>
-                </table>
+        <div class="table-container">
+            <table class="reports-table">
+                <thead>
+                    <tr>
+                        <th>USER</th>
+                        <th>BRANCH</th>
+                        <th>START DATE</th>
+                        <th>END DATE</th>
+                        <th>DRIVE 1</th>
+                        <th>DRIVE 2</th>
+                        <th>PREVIOUS BRANCH</th>
+                        <th>ACTIONS</th>
+                    </tr>
+                </thead>
+                <tbody id="reports-tbody">
+                    {% if reports %}
+                    {% for report in reports %}
+                    <tr>
+                        <td>
+                            <div class="user-cell">
+                                <div class="user-avatar">{{ report.username[0].upper() }}</div>
+                                <div class="user-info">
+                                    <span class="user-name">{{ report.username }}</span>
+                                </div>
+                            </div>
+                        </td>
+                        <td><span class="badge badge-branch">{{ report.branch }}</span></td>
+                        <td>{{ report.start_date }}</td>
+                        <td>{{ report.end_date }}</td>
+                        <td>{{ report.drive1 }}</td>
+                        <td>{{ report.drive2 }}</td>
+                        <td>{{ report.previous_branch }}</td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="action-btn view-btn" title="View"><i class="fas fa-eye"></i></button>
+                                <button class="action-btn edit-btn" title="Edit"
+                                    onclick="editReport('{{ report._id }}')"><i class="fas fa-edit"></i></button>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    {% else %}
+                    <tr>
+                        <td colspan="8" class="no-data">No reports submitted yet</td>
+                    </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Pagination -->
+        <div class="pagination-container">
+            <div class="pagination-info">
+                <span id="pagination-info">Showing <span id="start-record">1</span> to <span id="end-record">5</span> of
+                    <span id="total-records">{{ reports|length }}</span> entries</span>
             </div>
-
-            <!-- Pagination -->
-            <div class="pagination-container">
-                <div class="pagination-info">
-                    <span id="pagination-info">Showing <span id="start-record">1</span> to <span id="end-record">5</span> of <span id="total-records">{{ reports|length }}</span> entries</span>
-                </div>
-                <div class="pagination" id="pagination-wrapper">
-                    <button class="pagination-arrow" id="prev-btn" onclick="previousPage()">
-                        <i class="fas fa-chevron-left"></i>
-                    </button>
-                    <span class="current-page" id="current-page">1</span>
-                    <button class="pagination-arrow" id="next-btn" onclick="nextPage()">
-                        <i class="fas fa-chevron-right"></i>
-                    </button>
-                </div>
+            <div class="pagination" id="pagination-wrapper">
+                <button class="pagination-arrow" id="prev-btn" onclick="previousPage()">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+                <span class="current-page" id="current-page">1</span>
+                <button class="pagination-arrow" id="next-btn" onclick="nextPage()">
+                    <i class="fas fa-chevron-right"></i>
+                </button>
             </div>
         </div>
     </div>
+    </div>
 
     {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-            {% for category, message in messages %}
-                <div class="flash-message" data-type="{{ category }}" data-message="{{ message }}" style="display:none;"></div>
-            {% endfor %}
-        {% endif %}
+    {% if messages %}
+    {% for category, message in messages %}
+    <div class="flash-message" data-type="{{ category }}" data-message="{{ message }}" style="display:none;"></div>
+    {% endfor %}
+    {% endif %}
     {% endwith %}
 
     <script src="{{ url_for('static', filename='notifications.js') }}"></script>
     <script src="{{ url_for('static', filename='main.js') }}"></script>
 </body>
+
 </html>

@@ -85,7 +85,23 @@ def dashboard():
     reports_collection = db["Reports"]
     reports = list(reports_collection.find().sort('_id', -1))  # Get all reports, newest first
     
-    return render_template('dashboard.html', username=session['username'], reports=reports)
+    # Count branches from the predefined dropdown list (updated with all branches)
+    branches = [
+        "ACCRA CENTRAL", "ABBOSEY OKAI", "ABEAKA LAPAZ", "ABOABO", "ADENTA", 
+        "ADUM", "AIRPORT CITY", "AFFUL NKWANTA", "ATONSU", "CANTONMENT", 
+        "CAPE COAST", "EAST LEGON", "GICEL ESTATE", "HAATSO", "KUMASI", "MADINA",
+        "MAKOLA", "METHODIST UNIVERSITY", "NUNGUA", "ODORKOR", "OKAISHI", 
+        "RING ROAD CENTRAL", "SANTASI", "SPINTEX", "SUAME MAAKRO", "SUNYANI", 
+        "TAIFA", "TAKORADI HARBOUR", "TAMALE", "TAKORADI MARKET", "TECHIMAN", 
+        "TEMA COMMUNITY 1", "TEMA FISHING HARBOUR", "TESANO", "UCC ANNEX", 
+        "UNIVERSITY OF GHANA", "VALLEY VIEW", "WEIJA"
+    ]
+    branch_count = len(branches)
+    
+    return render_template('dashboard.html', 
+                         username=session['username'], 
+                         reports=reports,
+                         branch_count=branch_count)
 
 @app.route('/report')
 def report():
